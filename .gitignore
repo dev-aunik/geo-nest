@@ -1,0 +1,71 @@
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.nfs*
+
+# Root
+node_modules/
+dist/
+build/
+.cache/
+.temp/
+.tmp/
+
+# Go (API)
+/api/tmp/
+/api/err.txt
+/api/build_errors.txt
+/api/seed
+/api/vendor/
+/api/bin/
+*.exe
+*.test
+*.prof
+
+# Node.js (Web)
+/web/node_modules/
+/web/.next/
+/web/out/
+/web/build/
+/web/.turbo/
+/web/.vercel/
+/web/*.tsbuildinfo
+/web/.npm/
+/web/.eslintcache
+/web/npm-debug.log*
+/web/yarn-debug.log*
+/web/yarn-error.log*
+/web/pnpm-debug.log*
+
+# Environment Variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+! .env.example
+
+# Docker
+docker-compose.override.yml
+
+# IDEs
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Testing
+/coverage
+/.nyc_output

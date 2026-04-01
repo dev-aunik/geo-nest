@@ -1,0 +1,10 @@
+[
+  {"id": "1", "name": "Barishal", "bn_name": "篋腱篏"},
+  {"id": "2", "name": "Chattogram", "bn_name": "紮罸絎"},
+  {"id": "3", "name": "Dhaka", "bn_name": "紮"},
+  {"id": "4", "name": "Khulna", "bn_name": "篏腱"},
+  {"id": "5", "name": "Rajshahi", "bn_name": "紮罸篏"},
+  {"id": "6", "name": "Rangpur", "bn_name": "紮罸"},
+  {"id": "7", "name": "Sylhet", "bn_name": "篏腱罸"},
+  {"id": "8", "name": "Mymensingh", "bn_name": "紮罸篏"}
+]

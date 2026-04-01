@@ -1,0 +1,9 @@
+[
+  {"id": "1", "name": "Barguna", "bn_name": "篋腱", "division_id": "1"},
+  {"id": "2", "name": "Barishal", "bn_name": "篋腱篏", "division_id": "1"},
+  {"id": "3", "name": "Bhola", "bn_name": "篋腱", "division_id": "1"},
+  {"id": "4", "name": "Jhalokati", "bn_name": "紮罸篏", "division_id": "1"},
+  {"id": "5", "name": "Patuakhali", "bn_name": "紮罸篏", "division_id": "1"},
+  {"id": "6", "name": "Pirojpur", "bn_name": "紮罸篏", "division_id": "1"},
+  {"id": "7", "name": "Dhaka", "bn_name": "紮", "division_id": "3"}
+]
