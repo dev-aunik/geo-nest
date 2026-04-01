@@ -1,145 +1,178 @@
 # GeoNest
 
-> **Geo API for South Asia, USA & Japan** — administrative hierarchy data for 6 countries. API key in 30 seconds. 133,000+ areas. Free tier available.
+**Commercial-grade REST API for administrative & geographic hierarchy data.**
 
-## What is GeoNest?
+GeoNest provides high-performance access to geographic data (divisions, districts, cities, ZIP codes, wards) for 6 major countries. Built for developers who need clean, structured, and reliable geo-data via a "Stripe-like" integration experience.
 
-GeoNest is a commercial REST API that serves geographic/administrative hierarchy data — divisions, districts, cities, ZIP codes, wards — for developers. Think "Stripe for geo data".
+---
 
-**Phase 1 countries:** Bangladesh, Sri Lanka, Nepal, India, USA, Japan
+## 🌍 Supported Countries (Phase 1)
 
-## Quick Start
+*   **Bangladesh (BD)** — 4 levels (Division, District, Upazila, Union)
+*   **Sri Lanka (LK)** — 4 levels (Province, District, DS Division, GN Division)
+*   **Nepal (NP)** — 4 levels (Province, District, Municipality, Ward)
+*   **India (IN)** — 3 levels (State, District, Sub-District)
+*   **USA (US)** — 4 levels (State, County, City, ZIP Code)
+*   **Japan (JP)** — 3 levels (Prefecture, Municipality, Ward)
+
+---
+
+## 🛠 Tech Stack
+
+| Layer | Technology |
+| :--- | :--- |
+| **API Server** | [Go 1.22+](https://go.dev/) + [Fiber v3](https://docs.gofiber.io/) |
+| **Database** | [PostgreSQL 16](https://www.postgresql.org/) |
+| **Cache & RL** | [Redis 7](https://redis.io/) (Sliding window rate limiting) |
+| **Search** | [Typesense 27](https://typesense.org/) (Typo-tolerant search) |
+| **Frontend** | [Next.js 15](https://nextjs.org/) (App Router, TypeScript) |
+| **UI Components**| [Tailwind CSS](https://tailwindcss.com/) + [shadcn/ui](https://ui.shadcn.com/) |
+| **Payments** | [Stripe](https://stripe.com/) (Checkout & Customer Portal) |
+| **Email** | [Resend](https://resend.com/) (Transactional) |
+| **Infrastructure**| [Docker](https://www.docker.com/) + [Docker Compose](https://docs.docker.com/compose/) |
+| **Tooling** | [sqlc](https://sqlc.dev/), [golang-migrate](https://github.com/golang-migrate/migrate) |
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+*   [Docker](https://www.docker.com/products/docker-desktop/) & [Docker Compose](https://docs.docker.com/compose/install/)
+*   [Go 1.22+](https://go.dev/doc/install) (for local development)
+*   [Node.js 20+](https://nodejs.org/) (for local development)
+*   Stripe Account (for billing features)
+*   Resend API Key (for email features)
+
+### 1. Environment Configuration
+
+Clone the repository and create your `.env` file:
 
 ```bash
-# 1. Clone and configure
 cp .env.example .env
-# Edit .env with your Stripe + Resend keys
-
-# 2. Start all services
-docker-compose up -d
-
-# 3. Run migrations
-docker-compose exec api ./migrate -path migrations -database "$DATABASE_URL" up
-
-# 4. Seed geographic data
-# Place data files in api/seeds/data/ (see Seeds section below)
-docker-compose exec api ./seed
-
-# 5. Test the API
-curl http://localhost:8000/health
-curl http://localhost:8000/v1/geo/countries
 ```
 
-## Architecture
+Edit `.env` and fill in the following critical variables:
+*   `DATABASE_URL`: Connection string for PostgreSQL.
+*   `REDIS_URL`: Connection string for Redis.
+*   `TYPESENSE_API_KEY`: Your Typesense master key.
+*   `JWT_SECRET`: A 64-character random string for signing tokens.
+*   `STRIPE_SECRET_KEY` & `STRIPE_WEBHOOK_SECRET`: From your Stripe Dashboard.
+*   `RESEND_API_KEY`: From your Resend Dashboard.
 
-```
-┌─────────────┐    ┌───────────┐    ┌──────────────┐
-│  Next.js 15 │───▶│  Go+Fiber │───▶│  PostgreSQL  │
-│  (port 3000)│    │ (port 8000)│   │  (port 5432) │
-└─────────────┘    └───────────┘    └──────────────┘
-                         │               ┌──────────┐
-                         ├──────────────▶│  Redis 7 │
-                         │               │(port 6379)│
-                         │               └──────────┘
-                         │               ┌──────────────┐
-                         └──────────────▶│  Typesense   │
-                                         │  (port 8108) │
-                                         └──────────────┘
-```
+### 2. Start Services via Docker
 
-## Tech Stack
-
-| Layer | Tool |
-|-------|------|
-| API | Go 1.22 + Fiber v3 |
-| Database | PostgreSQL 16 |
-| Cache + Rate Limit | Redis 7 |
-| Search | Typesense 27 |
-| Frontend | Next.js 15 (App Router) |
-| UI | Tailwind CSS + shadcn/ui |
-| Payments | Stripe |
-| Email | Resend |
-| Containers | Docker + Compose |
-| DB Migrations | golang-migrate v4 |
-| DB Queries | sqlc |
-
-## Seeds — Data Files Required
-
-Place these files before running `./seed`:
-
-| Country | Files | Source |
-|---------|-------|--------|
-| Bangladesh | `seeds/data/bd/divisions.json`, `districts.json`, `upazilas.json`, `unions.json` | [bd-apis](https://github.com/SudipMHX/bd-apis) |
-| Sri Lanka | `seeds/data/lk/provinces.csv`, `districts.csv`, `ds_divisions.csv` | statistics.gov.lk |
-| Nepal | `seeds/data/np/provinces.json`, `districts.json`, `municipalities.json` | opennepal.net |
-| India | `seeds/data/in/states.csv`, `districts.csv`, `subdistricts.csv` | lgdirectory.gov.in |
-| USA | `seeds/data/us/states.csv`, `counties.csv`, `cities.csv`, `zipcodes.csv` | census.gov TIGER |
-| Japan | `seeds/data/jp/prefectures.csv`, `municipalities.csv`, `wards.csv` | stat.go.jp (convert Shift-JIS → UTF-8 first) |
-
-## API Endpoints
-
-### Public
-- `GET /health` — health check
-- `GET /v1/geo/countries` — list all supported countries
-- `POST /v1/auth/register` — create account
-- `POST /v1/auth/login` — get JWT tokens
-- `POST /v1/auth/refresh` — refresh access token
-
-### API Key Protected (X-API-Key header)
-- `GET /v1/geo/:cc` — country info
-- `GET /v1/geo/:cc/l1` — level 1 areas (divisions/states/provinces)
-- `GET /v1/geo/:cc/l2` — level 2 areas
-- `GET /v1/geo/:cc/l3` — level 3 areas
-- `GET /v1/geo/:cc/l4` — level 4 areas
-- `GET /v1/geo/:cc/l:n/:id/children` — children of an area
-- `GET /v1/geo/:cc/l:n/:id/ancestors` — ancestors of an area
-- `GET /v1/search?q=&cc=&level=` — full-text search
-- `GET /v1/search/autocomplete?q=` — autocomplete
-- `GET /v1/usage` — current usage stats
-- `GET /v1/usage/history` — usage history
-
-### JWT Protected (Dashboard)
-- `GET /v1/keys` — list API keys
-- `POST /v1/keys` — create API key
-- `POST /v1/keys/:id/rotate` — rotate key
-- `DELETE /v1/keys/:id` — revoke key
-- `GET /v1/billing/plans` — list plans
-- `POST /v1/billing/subscribe` — start Stripe checkout
-- `GET /v1/billing/portal` — Stripe customer portal
-
-## Plans
-
-| Plan | Price | Daily Requests | Per-Min |
-|------|-------|---------------|---------|
-| Free | $0 | 500 | 10 |
-| Starter | $9/mo | 50,000 | 100 |
-| Pro | $29/mo | 500,000 | 600 |
-| Enterprise | Custom | Unlimited | Unlimited |
-
-## Development
+The easiest way to get started is using Docker Compose:
 
 ```bash
-# Run API locally (with hot reload via air)
-cd api && air
-
-# Run frontend locally
-cd web && npm run dev
-
-# Run sqlc code generation (after changing queries/geo.sql)
-cd api && sqlc generate
-
-# Run migrations
-migrate -path api/migrations -database "$DATABASE_URL" up
+docker-compose up -d
 ```
 
-## Security
+This will spin up:
+*   **PostgreSQL**: Port 5432
+*   **Redis**: Port 6379
+*   **Typesense**: Port 8108
+*   **API (Fiber)**: Port 8000
+*   **Web (Next.js)**: Port 3000
 
-- API keys: SHA-256 hashed, never stored raw
-- Passwords: bcrypt
-- JWT: RS256 or HS256, 15min access / 30d refresh
-- Rate limiting: per-minute sliding window + daily quota in Redis
-- Security headers: CSP, HSTS, X-Frame-Options, etc.
+### 3. Database Migrations
 
-## License
+Run the SQL migrations to set up the schema and seed initial plans:
 
-Proprietary — All Rights Reserved
+```bash
+# Using golang-migrate (if installed locally)
+migrate -path api/migrations -database "$DATABASE_URL" up
+
+# OR via the API container
+docker-compose exec api ./migrate -path migrations -database "$DATABASE_URL" up
+```
+
+### 4. Seed Geographic Data
+
+GeoNest requires source data files to be present in `api/seeds/data/`. See the [Data Sources](#data-sources) section for links.
+
+Once the data is in place, run the seed script:
+
+```bash
+docker-compose exec api go run seeds/main.go
+```
+
+This script will:
+1.  Insert geographic hierarchies for all 6 countries.
+2.  Sync all data to **Typesense** for high-speed searching.
+
+---
+
+## 📂 Project Structure
+
+```text
+geonest/
+├── api/                # Go Backend (Fiber v3)
+│   ├── cmd/server/     # Entry point
+│   ├── internal/       # Business logic, handlers, services
+│   ├── migrations/     # SQL migration files
+│   ├── queries/        # sqlc input queries
+│   ├── seeds/          # Data seeding scripts & source JSON/CSV
+│   └── sqlc.yaml       # sqlc configuration
+├── web/                # Next.js Frontend (App Router)
+│   ├── app/            # Pages & Layouts
+│   ├── components/     # UI components (shadcn/ui)
+│   └── lib/            # API clients & utilities
+├── docker-compose.yml  # Development stack
+└── docker-compose.prod.yml # Production stack
+```
+
+---
+
+## 📡 API Documentation
+
+### Public Endpoints
+*   `GET /health` — System status.
+*   `GET /v1/geo/countries` — Supported countries & level metadata.
+*   `POST /v1/auth/register` — Create a new developer account.
+*   `POST /v1/auth/login` — Authenticate and receive JWT.
+
+### Core Data (Requires `X-API-Key`)
+*   `GET /v1/geo/:cc/l1` — Get Level 1 (States/Divisions).
+*   `GET /v1/geo/:cc/l1/:id/children` — Get children of a specific area.
+*   `GET /v1/search?q=query` — Typo-tolerant search across all areas.
+
+### Management (Requires JWT)
+*   `GET /v1/keys` — Manage your API keys.
+*   `POST /v1/billing/subscribe` — Start Stripe Checkout for Starter/Pro plans.
+
+---
+
+## 📈 Development Workflow
+
+### API Development (Hot Reload)
+```bash
+cd api
+air # Uses 'air' for live reloading
+```
+
+### Frontend Development
+```bash
+cd web
+npm run dev
+```
+
+### Database Changes
+1.  Add a new `.sql` file in `api/migrations/`.
+2.  Update `api/queries/geo.sql`.
+3.  Run `sqlc generate` inside the `api/` directory.
+
+---
+
+## 🔐 Security Standards
+
+*   **API Keys**: SHA-256 hashed storage. Never exposed after creation.
+*   **Rate Limiting**: Sliding window (per-minute) and daily quota enforced via Redis.
+*   **Security Headers**: Strict CSP, HSTS, X-Frame-Options, and X-Content-Type-Options.
+*   **Infrastructure**: Isolated Docker network; PostgreSQL/Redis not exposed to the public internet.
+
+---
+
+## 📄 License
+
+This project is licensed under the [Apache License 2.0](LICENSE).
