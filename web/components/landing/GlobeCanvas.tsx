@@ -361,7 +361,7 @@ export function GlobeCanvas() {
           arc.rotation.y = tick * 0.3 + targetRot.y;
           arc.rotation.x = Math.sin(tick * 0.2) * 0.1 + targetRot.x;
           // Pulse opacity
-          const mat = arc.material as THREE.LineBasicMaterial;
+          const mat = arc.material as { opacity: number };
           mat.opacity = 0.15 + Math.sin(tick * 2 + idx * 0.5) * 0.1;
         });
 

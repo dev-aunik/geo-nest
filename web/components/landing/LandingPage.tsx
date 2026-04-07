@@ -29,11 +29,15 @@ import {
 import { useTheme } from "next-themes";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
-// ── Dynamic import (Three.js — no SSR) ───────────────────────────────────────
 const GlobeCanvas = dynamic(
   () => import("./GlobeCanvas").then((m) => m.GlobeCanvas),
+  { ssr: false, loading: () => null },
+);
+
+const FooterGlobe = dynamic(
+  () => import("./FooterGlobe").then((m) => m.FooterGlobe),
   { ssr: false, loading: () => null },
 );
 
@@ -1065,7 +1069,7 @@ const PlanIcon = ({
   icon: string;
   className?: string;
 }) => {
-  const icons: Record<string, JSX.Element> = {
+  const icons: Record<string, React.ReactNode> = {
     shield: <Shield className={className} />,
     zap: <Zap className={className} />,
     rocket: <Rocket className={className} />,
@@ -1525,26 +1529,14 @@ function CTA() {
 
 function Footer() {
   return (
-    <footer className="bg-gray-50 dark:bg-[#03040e] border-t border-gray-200 dark:border-white/[0.05] pt-32 pb-16 px-5 transition-colors duration-500">
+    <footer className="bg-gray-50 dark:bg-[#03040e] border-t border-gray-200 dark:border-white/[0.05] pt-24 pb-16 px-5 transition-colors duration-500">
       <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-6 lg:grid-cols-12 gap-16 mb-24">
-          <div className="md:col-span-3 lg:col-span-5">
-            <Link href="/" className="flex items-center gap-3 mb-8 group w-fit">
-              <div className="relative w-10 h-10">
-                <div className="absolute inset-0 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-2xl blur-sm opacity-50 group-hover:opacity-100 transition-opacity" />
-                <div className="relative w-10 h-10 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-2xl flex items-center justify-center shadow-xl">
-                  <Globe className="text-white w-6 h-6" />
-                </div>
-              </div>
-              <span className="font-black text-2xl text-gray-900 dark:text-white tracking-tighter transition-all group-hover:tracking-normal">
-                GeoNest
-              </span>
-            </Link>
-            <p className="text-gray-500 dark:text-white/35 text-lg leading-relaxed max-w-sm mb-10 font-medium">
-              Geographic infrastructure for the next generation of digital
-              products. Building better location experiences since 2024.
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 mb-16">
+          <div className="col-span-2 lg:col-span-2"> 
+            <p className="text-gray-500 dark:text-white/35 text-base leading-relaxed max-w-sm mb-8 font-medium">
+              Geographic infrastructure for the next generation of digital products. Building better location experiences since 2024.
             </p>
-            <div className="flex gap-4">
+            <div className="flex gap-3">
               <a
                 href="#"
                 className="w-11 h-11 rounded-2xl bg-white dark:bg-white/[0.05] border border-gray-200 dark:border-white/[0.07] flex items-center justify-center text-gray-400 dark:text-white/30 hover:text-cyan-600 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/[0.10] hover:border-cyan-500/30 dark:hover:border-white/[0.14] transition-all shadow-sm"
@@ -1562,21 +1554,30 @@ function Footer() {
 
           {[
             {
-              title: "Platform",
+              title: "Product",
               links: [
+                ["Features", "#"],
+                ["Pricing", "/#pricing"],
                 ["Documentation", "/docs"],
-                ["Search API", "/docs/search"],
-                ["Endpoints", "/docs/endpoints"],
-                ["Status", "#"],
+                ["API Reference", "/docs/endpoints"],
               ],
             },
             {
               title: "Company",
               links: [
                 ["About", "#"],
-                ["Pricing", "/#pricing"],
                 ["Blog", "#"],
+                ["Careers", "#"],
                 ["Contact", "#"],
+              ],
+            },
+            {
+              title: "Resources",
+              links: [
+                ["Status", "#"],
+                ["Changelog", "#"],
+                ["Community", "#"],
+                ["Support", "#"],
               ],
             },
             {
@@ -1585,11 +1586,12 @@ function Footer() {
                 ["Privacy", "#"],
                 ["Terms", "#"],
                 ["License", "#"],
+                ["Security", "#"],
               ],
             },
           ].map((col) => (
-            <div key={col.title} className="md:col-span-1 lg:col-span-2">
-              <h4 className="text-gray-900 dark:text-white/60 font-black text-xs uppercase tracking-[0.2em] mb-8">
+            <div key={col.title}>
+              <h4 className="text-gray-900 dark:text-white/60 font-black text-xs uppercase tracking-[0.2em] mb-6">
                 {col.title}
               </h4>
               <ul className="space-y-4">
@@ -1607,24 +1609,26 @@ function Footer() {
             </div>
           ))}
         </div>
-
-        <div className="pt-12 border-t border-gray-200 dark:border-white/[0.05] flex flex-col md:flex-row justify-between items-center gap-8 text-gray-500 dark:text-white/20 text-sm font-semibold">
-          <p>
-            © {new Date().getFullYear()} GeoNest Platform. Engineered for
-            developers globally.
-          </p>
-          <div className="flex gap-10">
-            {["Changelog", "Security", "Support"].map((item) => (
-              <Link
-                key={item}
-                href="#"
-                className="hover:text-cyan-600 dark:hover:text-white/50 transition-colors uppercase tracking-widest text-[11px]"
-              >
-                {item}
-              </Link>
-            ))}
-          </div>
+        <div className="py-16 w-full">
+          <Link href="/" className="flex items-center justify-center gap-0 group w-full">
+            <span className="text-[100px] sm:text-[140px] md:text-[180px] lg:text-[240px] font-black text-gray-900 dark:text-white leading-none tracking-tighter">
+              ge
+            </span>
+            <span className="relative animate-float">
+              <div className="absolute inset-0 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-full blur-md opacity-60" />
+              <FooterGlobe />
+            </span>
+            <span className="text-[100px] sm:text-[140px] md:text-[180px] lg:text-[240px] font-black text-gray-900 dark:text-white leading-none tracking-tighter">
+              Nest
+            </span>
+          </Link>
         </div>
+
+        <div className="pt-8 border-t border-gray-200 dark:border-white/[0.05] flex justify-center">
+          <p className="text-gray-500 dark:text-white/20 text-sm font-semibold">
+            © {new Date().getFullYear()} GeoNest. Engineered for developers globally.
+          </p>
+        </div> 
       </div>
     </footer>
   );
