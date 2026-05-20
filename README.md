@@ -173,6 +173,17 @@ npm run dev
 
 ---
 
+## Operational Checks
+
+Before a release, verify:
+
+*   `GET /health` returns a successful response.
+*   Database migrations have run successfully.
+*   Redis and Typesense are reachable from the API container.
+*   API keys and billing secrets are provided through environment variables.
+
+---
+
 ## 📄 License
 
 This project is licensed under the [Apache License 2.0](LICENSE).
